@@ -1,53 +1,209 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeck</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0b0b0b;
-            color: white;
-            text-align: center;
-        }
-
-        .container {
-            padding: 80px 20px;
-        }
-
-        h1 {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: #aaa;
-            font-size: 18px;
-        }
-
-        button {
-            margin-top: 25px;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            background: white;
-            color: black;
-            font-size: 16px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collect Coins for Black Holes</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#070916;color:#f5f3ff;font-family:Arial,sans-serif}
+header{text-align:center;padding:22px 12px;background:linear-gradient(135deg,#171039,#09152c);border-bottom:1px solid #41326c}
+h1{font-size:23px;color:#c4b5fd;margin:0 0 8px}
+header p{margin:0;color:#aaa5c9;font-size:12px}
+main{max-width:500px;margin:auto;padding:16px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat,.panel{background:#11152a;border:1px solid #292d4e;border-radius:14px;padding:14px}
+.label{font-size:12px;color:#a7acd0}
+.value{font-size:23px;font-weight:bold;color:#facc15;margin-top:7px;overflow-wrap:anywhere}
+.space{height:230px;position:relative;overflow:hidden;margin:15px 0;background:radial-gradient(ellipse at center,#1b1745 0%,#0c1026 50%,#070916 100%);border:1px solid #29234f;border-radius:18px;display:flex;align-items:center;justify-content:center}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:white;opacity:.65}
+.hole{width:125px;height:125px;border-radius:50%;background:radial-gradient(circle,#000 35%,#100c27 39%,#8b5cf6 44%,#26d9fa 48%,#45208b 55%,transparent 70%);box-shadow:0 0 25px #8b5cf6,0 0 55px #5426ba;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:transform .12s;user-select:none;-webkit-tap-highlight-color:transparent}
+.hole:active{transform:scale(.88)}
+.hole span{font-size:36px}
+.hole.pulse{animation:pulse .4s}
+@keyframes pulse{50%{filter:brightness(1.8)}}
+.hint{position:absolute;bottom:12px;color:#a7acd0;font-size:12px;text-align:center}
+.panel{margin-top:13px}
+.panel h2{font-size:17px;margin:0 0 12px}
+.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid #292d4e}
+.item:first-of-type{border-top:0}
+.emoji{font-size:30px;width:42px;text-align:center}
+.info{flex:1;min-width:0}
+.info b{font-size:14px}
+.info p{margin:5px 0;color:#a7acd0;font-size:12px;line-height:1.4}
+button{border:0;border-radius:9px;padding:10px;background:#7554e8;color:white;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.buy{min-width:93px;font-size:12px}
+#tapButton{display:block;width:100%;padding:14px;font-size:16px;background:linear-gradient(90deg,#7c3aed,#2563eb)}
+.notice{text-align:center;font-size:12px;color:#a7acd0;min-height:18px;margin:12px 0}
+footer{text-align:center;color:#656b8c;font-size:11px;padding:22px}
+</style>
 </head>
-
 <body>
-    <div class="container">
-        <h1>JECK</h1>
-        <p>Selamat datang di website saya.</p>
+<header>
+<h1>🌌 COLLECT COINS</h1>
+<p>BUILD YOUR BLACK HOLE EMPIRE</p>
+</header>
 
-        <button onclick="alert('Halo! 👋')">
-            Klik Saya
-        </button>
-    </div>
+<main>
+<div class="stats">
+ <div class="stat"><div class="label">🪙 TOTAL COINS</div><div class="value" id="coins">0</div></div>
+ <div class="stat"><div class="label">⚡ COINS / SECOND</div><div class="value" id="cps">0</div></div>
+</div>
+
+<div class="space" id="space">
+ <div class="hole" id="hole"><span>🌑</span></div>
+ <div class="hint">TAP THE BLACK HOLE TO COLLECT COINS</div>
+</div>
+
+<button id="tapButton">🪙 COLLECT COINS</button>
+<div class="notice" id="notice">Your cosmic journey begins now!</div>
+
+<section class="panel">
+<h2>🌀 Black Hole Shop</h2>
+<div id="shop"></div>
+</section>
+
+<section class="panel">
+<h2>⚡ Upgrades</h2>
+<div class="item">
+ <div class="emoji">✨</div>
+ <div class="info"><b>Cosmic Touch</b><p id="powerInfo">More coins per tap</p></div>
+ <button class="buy" id="powerBuy"></button>
+</div>
+<div class="item">
+ <div class="emoji">🪐</div>
+ <div class="info"><b>Gravity Boost</b><p id="gravityInfo">Increase all black hole production by 25%</p></div>
+ <button class="buy" id="gravityBuy"></button>
+</div>
+</section>
+
+<section class="panel">
+<h2>🏆 Statistics</h2>
+<div class="item"><div class="info">Total coins collected</div><b id="total">0</b></div>
+<div class="item"><div class="info">Black holes owned</div><b id="owned">0</b></div>
+<div class="item"><div class="info">Tap power</div><b id="tapPower">1</b></div>
+</section>
+
+<button id="reset" style="width:100%;margin-top:14px;background:#292d43">Reset Progress</button>
+</main>
+<footer>JECK GAMES • COLLECT COINS FOR BLACK HOLES</footer>
+
+<script>
+const holes = [
+ {name:"Mini Black Hole",emoji:"🌑",cost:100,rate:1},
+ {name:"Stellar Black Hole",emoji:"🌀",cost:1000,rate:12},
+ {name:"Supermassive Black Hole",emoji:"🌌",cost:10000,rate:150},
+ {name:"Cosmic Singularity",emoji:"💫",cost:100000,rate:2000},
+ {name:"Galaxy Devourer",emoji:"🌠",cost:1000000,rate:30000}
+];
+
+const fresh = () => ({
+ coins:0,total:0,levels:[0,0,0,0,0],powerLevel:0,gravityLevel:0
+});
+
+let game=fresh();
+try {
+ const saved=JSON.parse(localStorage.getItem("cbh-save"));
+ if(saved && typeof saved.coins==="number" &&
+    Array.isArray(saved.levels) && saved.levels.length===5 &&
+    saved.levels.every(n=>Number.isInteger(n)&&n>=0) &&
+    Number.isFinite(saved.total)&&saved.total>=0 &&
+    Number.isInteger(saved.powerLevel)&&saved.powerLevel>=0&&
+    Number.isInteger(saved.gravityLevel)&&saved.gravityLevel>=0) {
+   game={...fresh(),...saved};
+ }
+} catch(e) {}
+
+let noticeTimer;
+function say(text){
+ document.getElementById("notice").textContent=text;
+ clearTimeout(noticeTimer);
+ noticeTimer=setTimeout(()=>document.getElementById("notice").textContent="Keep building your cosmic empire!",2400);
+}
+function fmt(n){
+ if(n>=1e12)return (n/1e12).toFixed(2)+"T";
+ if(n>=1e9)return (n/1e9).toFixed(2)+"B";
+ if(n>=1e6)return (n/1e6).toFixed(2)+"M";
+ if(n>=1e4)return (n/1e3).toFixed(1)+"K";
+ return Math.floor(n).toLocaleString("en-US");
+}
+function tapPower(){return Math.pow(2,game.powerLevel)}
+function production(){
+ return game.levels.reduce((sum,l,i)=>sum+l*holes[i].rate,0)*Math.pow(1.25,game.gravityLevel);
+}
+function costPower(){return Math.floor(50*Math.pow(2.0,game.powerLevel))}
+function costGravity(){return Math.floor(500*Math.pow(2.2,game.gravityLevel))}
+function save(){
+ try{localStorage.setItem("cbh-save",JSON.stringify(game))}catch(e){}
+}
+function render(){
+ document.getElementById("coins").textContent=fmt(game.coins);
+ document.getElementById("cps").textContent=fmt(production());
+ document.getElementById("total").textContent=fmt(game.total);
+ document.getElementById("owned").textContent=game.levels.reduce((a,b)=>a+b,0);
+ document.getElementById("tapPower").textContent=fmt(tapPower());
+ document.getElementById("powerInfo").textContent="Tap earns "+fmt(tapPower())+" coins. Next level doubles it.";
+ document.getElementById("gravityInfo").textContent="Current production multiplier: "+Math.pow(1.25,game.gravityLevel).toFixed(2)+"x";
+ const pb=costPower(),gb=costGravity();
+ document.getElementById("powerBuy").textContent=fmt(pb)+" 🪙";
+ document.getElementById("powerBuy").disabled=game.coins<pb;
+ document.getElementById("gravityBuy").textContent=fmt(gb)+" 🪙";
+ document.getElementById("gravityBuy").disabled=game.coins<gb;
+ document.getElementById("shop").innerHTML=holes.map((h,i)=>{
+  const cost=Math.floor(h.cost*Math.pow(1.65,game.levels[i]));
+  return `<div class="item">
+   <div class="emoji">${h.emoji}</div>
+   <div class="info"><b>${h.name}</b><p>Owned: ${game.levels[i]} · +${fmt(h.rate)} coins/sec each</p></div>
+   <button class="buy" data-buy="${i}" ${game.coins<cost?"disabled":""}>${fmt(cost)} 🪙</button>
+  </div>`;
+ }).join("");
+ document.querySelectorAll("[data-buy]").forEach(btn=>{
+  btn.onclick=()=>buyHole(Number(btn.dataset.buy));
+ });
+}
+function collect(){
+ const n=tapPower();
+ game.coins+=n;game.total+=n;
+ const el=document.getElementById("hole");
+ el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");
+ render();save();
+}
+function buyHole(i){
+ const cost=Math.floor(holes[i].cost*Math.pow(1.65,game.levels[i]));
+ if(game.coins<cost)return;
+ game.coins-=cost;game.levels[i]++;
+ say("Purchased "+holes[i].name+"! 🌌");
+ render();save();
+}
+document.getElementById("hole").onclick=collect;
+document.getElementById("tapButton").onclick=collect;
+document.getElementById("powerBuy").onclick=()=>{
+ const c=costPower();if(game.coins<c)return;
+ game.coins-=c;game.powerLevel++;
+ say("Cosmic Touch upgraded! ✨");render();save();
+};
+document.getElementById("gravityBuy").onclick=()=>{
+ const c=costGravity();if(game.coins<c)return;
+ game.coins-=c;game.gravityLevel++;
+ say("Gravity boosted! 🪐");render();save();
+};
+document.getElementById("reset").onclick=()=>{
+ if(confirm("Reset all coins and upgrades?")){
+  game=fresh();save();render();say("A new universe begins!");
+ }
+};
+let last=Date.now();
+setInterval(()=>{
+ const now=Date.now();
+ const elapsed=Math.min((now-last)/1000,2);
+ last=now;
+ const earned=production()*elapsed;
+ if(earned>0){game.coins+=earned;game.total+=earned}
+ render();save();
+},1000);
+render();
+</script>
 </body>
-</html>
+    </html>
+    
